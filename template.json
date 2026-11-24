@@ -33,7 +33,7 @@
    },
    "startCommand": null,
    "preDeployCommand": null,
-   "healthcheckPath": "/s/login",
+   "healthcheckPath": "/railway-healthz",
    "healthcheckTimeout": 1200,
    "restartPolicyType": "ALWAYS",
    "numReplicas": 1,

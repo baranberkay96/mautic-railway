@@ -35,7 +35,9 @@ RUN echo "MPMs before: $(ls /etc/apache2/mods-enabled | grep mpm_ | tr '\n' ' ')
  && echo "MPMs after: $(ls /etc/apache2/mods-enabled | grep mpm_ | tr '\n' ' ')"
 
 COPY --chmod=0755 railway-start.sh mautic-scheduler.sh /railway/
-COPY --chmod=0644 mautic-admin.php /railway/
+COPY --chmod=0644 mautic-admin.php railway-healthz.php /railway/
+COPY --chmod=0644 railway-healthz.conf /etc/apache2/conf-available/railway-healthz.conf
+RUN a2enconf railway-healthz >/dev/null
 
 ENV PORT=80
 EXPOSE 80

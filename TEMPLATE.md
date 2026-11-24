@@ -6,7 +6,7 @@ Composer spec. `template.json` is the machine-readable copy.
 
 | Service | Source | Public | Healthcheck | Volume | Restart |
 |---|---|---|---|---|---|
-| Mautic | repo `baranberkay96/mautic-railway`, root `/services/mautic` (`FROM mautic/mautic:7.2.2-apache@sha256:cb5a72a6…`, build 2026-11-19, + Symfony Mailer API bridges) | 80 | `/s/login`, 1200 s | `/data` | ALWAYS |
+| Mautic | repo `baranberkay96/mautic-railway`, root `/services/mautic` (`FROM mautic/mautic:7.2.2-apache@sha256:cb5a72a6…`, build 2026-11-19, + Symfony Mailer API bridges) | 80 | `/railway-healthz` (installed + MySQL `SELECT 1`; Apache alias outside the docroot), 1200 s | `/data` | ALWAYS |
 | MySQL | `mysql:8.4.13@sha256:8c233bad…` (LTS), buffer pool 256M | no | — | `/var/lib/mysql` | ON_FAILURE |
 
 Required input: `MAUTIC_ADMIN_EMAIL`. Generated: `MAUTIC_ADMIN_PASSWORD` (24), MySQL root and user passwords.
@@ -36,7 +36,7 @@ Estimated cost ≈ $8–15/month + volumes. Minimum plan: Hobby.
 
 ## Verification checklist
 
-- `/s/login` 200; `/installer` does not offer an installation.
+- `/railway-healthz` 200 and `/s/login` 200 over https; `/installer` does not offer an installation.
 - Admin login works; create a contact, a segment and an email.
 - Deploy log shows each `railway-cron:` job once with exit code 0 and the consumers running.
 - `MAUTIC_ADMIN_PASSWORD=abc` → SUCCESS, warning, old password works.
