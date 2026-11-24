@@ -1,5 +1,7 @@
 # Deploy and Host Mautic with Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/mautic-72-marketing-automation-mysql-cro?referralCode=20H68q)
+
 Mautic is the open-source marketing automation platform: contacts and segments, email campaigns and newsletters, multi-step campaign workflows, landing pages, forms, lead scoring and website tracking. This template runs Mautic 7 on Railway with MySQL, its cron jobs and queue workers, installed from the command line so the web installer is never exposed.
 
 ## About Hosting Mautic
