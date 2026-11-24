@@ -47,7 +47,7 @@ Mautic is a Symfony (PHP) application. Besides the web server it needs scheduled
 
 **Site URL.** `MAUTIC_SITE_URL` (your Railway domain by default) is used in tracking code and links in emails. Set it to your custom domain when you add one.
 
-**Scaling and upgrades.** Keep one Mautic replica (files live on the volume); raise `DOCKER_MAUTIC_WORKERS_CONSUME_EMAIL` for large sends and give MySQL more memory for big contact lists. The stack idles at roughly 0.9 GB RAM, so use the Hobby plan or higher. To upgrade, eject the repo, change the `mautic/mautic` tag and digest in `services/mautic/Dockerfile` and redeploy; database migrations run at start. Back up MySQL first and read the upgrade notes for major versions.
+**Scaling and upgrades.** Keep one Mautic replica (files live on the volume); raise `DOCKER_MAUTIC_WORKERS_CONSUME_EMAIL` for large sends and give MySQL more memory for big contact lists. The stack idled at about 0.65 GB RAM in our tests (Mautic plus MySQL); use the Hobby plan or higher. To upgrade, eject the repo, change the `mautic/mautic` tag and digest in `services/mautic/Dockerfile` and redeploy; database migrations run at start. Back up MySQL first and read the upgrade notes for major versions.
 
 ### Why Deploy Mautic on Railway?
 

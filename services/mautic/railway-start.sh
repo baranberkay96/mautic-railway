@@ -31,9 +31,12 @@ if ! [[ $port =~ ^[0-9]{1,5}$ ]] || ((port < 1 || port > 65535)); then
   port=$DEFAULT_PORT
 fi
 sed -ri "s/^Listen .*/Listen $port/" /etc/apache2/ports.conf
+# mod_php needs prefork only. The php:apache base disables mpm_event in a
+# lower layer, and on Railway that deleted link reappears at runtime
+# (STANDARD 8.38): Apache then fails with "More than one MPM loaded".
 mpms=$(ls /etc/apache2/mods-enabled | grep -c '^mpm_.*\.load$' || true)
 if [[ $mpms != 1 ]]; then
-  log "WARNING: $mpms Apache MPMs enabled; keeping only mpm_prefork"
+  log "$mpms Apache MPMs enabled (Railway runtime); keeping only mpm_prefork"
   a2dismod -f mpm_event mpm_worker >/dev/null 2>&1 || true
   a2enmod mpm_prefork >/dev/null 2>&1 || true
 fi

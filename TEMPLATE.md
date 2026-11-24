@@ -17,6 +17,8 @@ Required input: `MAUTIC_ADMIN_EMAIL`. Generated: `MAUTIC_ADMIN_PASSWORD` (24), M
 - STANDARD 8.37: `mautic:install --force` from the CLI before Apache starts; with `db_driver` and `site_url` in `local.php` the web installer is closed. If the install does not finish, the start fails (fail closed).
 - Later starts: `doctrine:migrations:migrate`, then `mautic-admin.php` (PDO) re-applies `MAUTIC_ADMIN_PASSWORD` only if `password_verify` fails; `cache:clear`.
 - `mautic-scheduler.sh`: interval-based (no overlap, all jobs once ~60 s after start): segments:update 15 min, campaigns:update 15 min, campaigns:trigger 5 min, broadcasts:send 5 min, import 5 min, webhooks:process 5 min, contacts:scheduled_export 15 min, reports:scheduler 60 min. Each run logs `railway-cron: <job> finished with exit code N`.
+- Behind Railway's edge Mautic redirected every page to itself: its middleware reads `trusted_proxies` only from config files, not env. `railway-start.sh` writes `config/parameters_local.php` from `MAUTIC_TRUSTED_PROXIES` (default all IPv4+IPv6) at every start.
+- Apache MPM: `php:apache` disables mpm_event in a lower layer; on Railway it reappears (8.38) → start script removes extra MPMs before Apache starts.
 - Messenger: `MAUTIC_MESSENGER_DSN_EMAIL/HIT=doctrine://default` (as in upstream's example) so the consumers have queues to read.
 - Mail: `symfony/{amazon,sendgrid,postmark,mailgun,brevo}-mailer` ~7.4.0 added with Composer (Railway SMTP is Pro-only).
 - 8.29: PORT → 80, email → admin@example.com, username → admin, password outside 12–72 → lock mode (random on a new install, existing kept), worker counts clamped to 1–9.
@@ -29,10 +31,10 @@ Required input: `MAUTIC_ADMIN_EMAIL`. Generated: `MAUTIC_ADMIN_PASSWORD` (24), M
 
 | Service | Idle RAM | Typical | CPU |
 |---|---|---|---|
-| Mautic | see report | 0.6–1.2 GB (Apache + 3 PHP workers; more during sends) | low, bursts on cron |
-| MySQL | see report | 0.4–0.8 GB | low |
+| Mautic | 0.20–0.40 GB measured | 0.5–1.0 GB (Apache + 3 PHP workers; more during sends) | low, bursts on cron |
+| MySQL | 0.23–0.28 GB measured | 0.4–0.8 GB | low |
 
-Estimated cost ≈ $8–15/month + volumes. Minimum plan: Hobby.
+Measured ≈ 0.65 GB idle in total → ≈ $7–12/month + volumes. Minimum plan: Hobby.
 
 ## Verification checklist
 
