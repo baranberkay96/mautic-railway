@@ -194,12 +194,12 @@
     },
     "MYSQLPASSWORD": {
      "defaultValue": "${{MYSQL_PASSWORD}}",
-     "description": "Password for Ghost and Railway's Data tab.",
+     "description": "Password for Mautic and Railway's Data tab.",
      "required": false
     },
     "MYSQLDATABASE": {
      "defaultValue": "${{MYSQL_DATABASE}}",
-     "description": "Database for Ghost and Railway's Data tab.",
+     "description": "Database for Mautic and Railway's Data tab.",
      "required": false
     },
     "MYSQL_URL": {
