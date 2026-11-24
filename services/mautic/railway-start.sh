@@ -104,6 +104,7 @@ if installed; then
   as_www "$CONSOLE doctrine:migrations:migrate --no-interaction --allow-no-migration"
 else
   log "Installing Mautic for $site_url (admin user '$username')"
+  log "debug: $(ls -ld "$DATA" "$DATA/config" "$APP/config" 2>&1 | tr '\n' ';') writable-as-www-data: $(su -s /bin/bash www-data -c "test -w $APP/config/ && echo yes || echo no") id: $(id www-data)"
   printf '%s' "$password" > /tmp/railway-admin-password
   chown www-data:www-data /tmp/railway-admin-password
   chmod 0600 /tmp/railway-admin-password
