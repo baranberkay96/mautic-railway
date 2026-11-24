@@ -96,8 +96,8 @@
      "required": false
     },
     "MAUTIC_TRUSTED_PROXIES": {
-     "defaultValue": "[\"0.0.0.0/0\"]",
-     "description": "Trust Railway's edge proxy so Mautic sees HTTPS and client IPs.",
+     "defaultValue": "[\"0.0.0.0/0\",\"::/0\"]",
+     "description": "Proxies whose X-Forwarded-* headers Mautic trusts (JSON list); Railway's edge needs all.",
      "required": false
     },
     "MAUTIC_MESSENGER_DSN_EMAIL": {

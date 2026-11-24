@@ -87,6 +87,19 @@ link "$APP/docroot/media/files" "$DATA/media/files"
 if [[ ! -f $DATA/config/local.php ]]; then
   cp /templates/local.php "$DATA/config/local.php"
 fi
+# Mautic's request middleware reads trusted_proxies only from config files,
+# not from the environment; without it every page redirects to itself
+# (Railway's edge terminates TLS). Write it to parameters_local.php, which
+# Mautic merges over local.php, from MAUTIC_TRUSTED_PROXIES.
+RW_PROXIES=${MAUTIC_TRUSTED_PROXIES:-} php -r '
+  $p = json_decode((string) getenv("RW_PROXIES"), true);
+  if (!is_array($p) || [] === $p || array_filter($p, fn ($v) => !is_string($v) || "" === $v)) {
+      fwrite(STDERR, "railway-start: MAUTIC_TRUSTED_PROXIES is not a JSON list of CIDRs; using 0.0.0.0/0 and ::/0\n");
+      $p = ["0.0.0.0/0", "::/0"];
+  }
+  file_put_contents("/data/config/parameters_local.php",
+      "<?php\n// Written by railway-start.sh from MAUTIC_TRUSTED_PROXIES at every start.\n\$parameters = ".var_export(["trusted_proxies" => array_values($p)], true).";\n");
+'
 mkdir -p "$APP/var/logs" "$APP/var/tmp"
 find "$DATA" "$APP/var" \( ! -user www-data -o ! -group www-data \) -exec chown -h www-data:www-data {} +
 
