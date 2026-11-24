@@ -31,6 +31,12 @@ if ! [[ $port =~ ^[0-9]{1,5}$ ]] || ((port < 1 || port > 65535)); then
   port=$DEFAULT_PORT
 fi
 sed -ri "s/^Listen .*/Listen $port/" /etc/apache2/ports.conf
+mpms=$(ls /etc/apache2/mods-enabled | grep -c '^mpm_.*\.load$' || true)
+if [[ $mpms != 1 ]]; then
+  log "WARNING: $mpms Apache MPMs enabled; keeping only mpm_prefork"
+  a2dismod -f mpm_event mpm_worker >/dev/null 2>&1 || true
+  a2enmod mpm_prefork >/dev/null 2>&1 || true
+fi
 sed -ri "s/<VirtualHost \*:[0-9]+>/<VirtualHost *:$port>/" /etc/apache2/sites-available/000-default.conf
 
 email=${MAUTIC_ADMIN_EMAIL:-}

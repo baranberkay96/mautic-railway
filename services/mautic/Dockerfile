@@ -27,6 +27,13 @@ RUN mkdir -p /opt/railway-seed \
  && cp -a /var/www/html/docroot/media/images /opt/railway-seed/images \
  && cp -a /var/www/html/docroot/media/files /opt/railway-seed/files
 
+# mod_php needs the prefork MPM; make sure it is the only MPM enabled
+# (on Railway the image started with two MPMs: "More than one MPM loaded").
+RUN echo "MPMs before: $(ls /etc/apache2/mods-enabled | grep mpm_ | tr '\n' ' ')" \
+ && (a2dismod -f mpm_event mpm_worker >/dev/null 2>&1 || true) \
+ && a2enmod mpm_prefork >/dev/null \
+ && echo "MPMs after: $(ls /etc/apache2/mods-enabled | grep mpm_ | tr '\n' ' ')"
+
 COPY --chmod=0755 railway-start.sh mautic-scheduler.sh /railway/
 COPY --chmod=0644 mautic-admin.php /railway/
 
