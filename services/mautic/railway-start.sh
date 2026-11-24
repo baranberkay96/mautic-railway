@@ -76,6 +76,11 @@ link() {  # link <app path> <volume path>
 link "$APP/config" "$DATA/config"
 link "$APP/docroot/media/images" "$DATA/media/images"
 link "$APP/docroot/media/files" "$DATA/media/files"
+# Like the official image: start from its local.php template (database
+# settings read from the environment); the installer completes it.
+if [[ ! -f $DATA/config/local.php ]]; then
+  cp /templates/local.php "$DATA/config/local.php"
+fi
 mkdir -p "$APP/var/logs" "$APP/var/tmp"
 find "$DATA" "$APP/var" \( ! -user www-data -o ! -group www-data \) -exec chown -h www-data:www-data {} +
 
@@ -104,7 +109,6 @@ if installed; then
   as_www "$CONSOLE doctrine:migrations:migrate --no-interaction --allow-no-migration"
 else
   log "Installing Mautic for $site_url (admin user '$username')"
-  log "debug: su-touch: $(su -s /bin/bash www-data -c 'touch /data/config/.t1 2>&1; echo rc=$?; id; ls -ld /data/config') | setpriv-touch: $(setpriv --reuid=33 --regid=33 --init-groups sh -c 'touch /data/config/.t2 2>&1; echo rc=$?') | mount: $(grep " /data " /proc/mounts)"
   printf '%s' "$password" > /tmp/railway-admin-password
   chown www-data:www-data /tmp/railway-admin-password
   chmod 0600 /tmp/railway-admin-password
