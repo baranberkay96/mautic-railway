@@ -1,0 +1,214 @@
+{
+ "name": "Mautic 7.2 Marketing Automation (MySQL, Cron, Workers)",
+ "idSeed": "Mautic 7.2 Marketing Automation (MySQL, Cron, Workers) / 2026-11-24",
+ "description": "Open-source marketing automation: email campaigns, segments, landing pages.",
+ "category": "Other",
+ "tags": [
+  "mautic",
+  "marketing-automation",
+  "email-marketing",
+  "campaigns",
+  "crm",
+  "landing-pages",
+  "hubspot-alternative",
+  "mysql"
+ ],
+ "image": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/mautic.svg",
+ "upstream": {
+  "repo": "mautic/mautic",
+  "version": "7.2.2",
+  "license": "GPL-3.0",
+  "images": {
+   "mautic": "mautic/mautic:7.2.2-apache@sha256:cb5a72a63c855917c2c6eca65cd368b02d8d491bc135d3834e85ba5d575d789c (2026-11-19)",
+   "mysql": "mysql:8.4.13@sha256:8c233bad33d520a7aae1c1e619c3a9775f4a1ba2d463d692fada04ec7f40be00 (2026-11-24)"
+  },
+  "checked": "2026-11-24"
+ },
+ "services": {
+  "Mautic": {
+   "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/mautic.svg",
+   "source": {
+    "repo": "baranberkay96/mautic-railway",
+    "rootDirectory": "/services/mautic"
+   },
+   "startCommand": null,
+   "preDeployCommand": null,
+   "healthcheckPath": "/s/login",
+   "healthcheckTimeout": 1200,
+   "restartPolicyType": "ALWAYS",
+   "numReplicas": 1,
+   "cronSchedule": null,
+   "publicDomain": true,
+   "targetPort": 80,
+   "tcpProxy": null,
+   "volume": {
+    "mountPath": "/data"
+   },
+   "variables": {
+    "MAUTIC_ADMIN_EMAIL": {
+     "defaultValue": "",
+     "description": "Email of the admin user created on the first start.",
+     "required": true
+    },
+    "MAUTIC_ADMIN_USERNAME": {
+     "defaultValue": "admin",
+     "description": "Admin login name.",
+     "required": false
+    },
+    "MAUTIC_ADMIN_PASSWORD": {
+     "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+     "description": "Admin password (12-72 chars), applied at every start: change it here, not in the app.",
+     "required": false
+    },
+    "MAUTIC_SITE_URL": {
+     "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+     "description": "Public URL used in tracking scripts and email links. Change it with a custom domain.",
+     "required": false
+    },
+    "MAUTIC_DB_HOST": {
+     "defaultValue": "${{MySQL.MYSQLHOST}}",
+     "description": "MySQL host (private network).",
+     "required": false
+    },
+    "MAUTIC_DB_PORT": {
+     "defaultValue": "${{MySQL.MYSQLPORT}}",
+     "description": "MySQL port.",
+     "required": false
+    },
+    "MAUTIC_DB_NAME": {
+     "defaultValue": "${{MySQL.MYSQL_DATABASE}}",
+     "description": "MySQL database.",
+     "required": false
+    },
+    "MAUTIC_DB_DATABASE": {
+     "defaultValue": "${{MAUTIC_DB_NAME}}",
+     "description": "Same database name (read by the official image's scripts).",
+     "required": false
+    },
+    "MAUTIC_DB_USER": {
+     "defaultValue": "${{MySQL.MYSQL_USER}}",
+     "description": "MySQL user.",
+     "required": false
+    },
+    "MAUTIC_DB_PASSWORD": {
+     "defaultValue": "${{MySQL.MYSQL_PASSWORD}}",
+     "description": "MySQL password.",
+     "required": false
+    },
+    "MAUTIC_TRUSTED_PROXIES": {
+     "defaultValue": "[\"0.0.0.0/0\"]",
+     "description": "Trust Railway's edge proxy so Mautic sees HTTPS and client IPs.",
+     "required": false
+    },
+    "MAUTIC_MESSENGER_DSN_EMAIL": {
+     "defaultValue": "doctrine://default",
+     "description": "Queue emails in the database; the built-in workers send them.",
+     "required": false
+    },
+    "MAUTIC_MESSENGER_DSN_HIT": {
+     "defaultValue": "doctrine://default",
+     "description": "Queue page and email hits in the database; the built-in workers process them.",
+     "required": false
+    },
+    "DOCKER_MAUTIC_WORKERS_CONSUME_EMAIL": {
+     "defaultValue": "1",
+     "description": "Email queue workers (1-9).",
+     "required": false
+    },
+    "DOCKER_MAUTIC_WORKERS_CONSUME_HIT": {
+     "defaultValue": "1",
+     "description": "Hit queue workers (1-9).",
+     "required": false
+    },
+    "PHP_INI_VALUE_DATE_TIMEZONE": {
+     "defaultValue": "UTC",
+     "description": "PHP time zone.",
+     "required": false
+    },
+    "PHP_INI_VALUE_MEMORY_LIMIT": {
+     "defaultValue": "512M",
+     "description": "PHP memory limit per process.",
+     "required": false
+    },
+    "PORT": {
+     "defaultValue": "80",
+     "description": "Port Apache listens on; the public domain points here.",
+     "required": false
+    }
+   }
+  },
+  "MySQL": {
+   "icon": "https://devicons.railway.app/i/mysql.svg",
+   "source": {
+    "image": "mysql:8.4.13@sha256:8c233bad33d520a7aae1c1e619c3a9775f4a1ba2d463d692fada04ec7f40be00"
+   },
+   "startCommand": "docker-entrypoint.sh mysqld --innodb-use-native-aio=0 --disable-log-bin --performance_schema=0 --innodb-buffer-pool-size=256M",
+   "preDeployCommand": null,
+   "healthcheckPath": null,
+   "healthcheckTimeout": null,
+   "restartPolicyType": "ON_FAILURE",
+   "restartPolicyMaxRetries": 10,
+   "numReplicas": 1,
+   "cronSchedule": null,
+   "publicDomain": false,
+   "targetPort": null,
+   "tcpProxy": null,
+   "volume": {
+    "mountPath": "/var/lib/mysql"
+   },
+   "variables": {
+    "MYSQL_ROOT_PASSWORD": {
+     "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+     "description": "Root password (generated).",
+     "required": false
+    },
+    "MYSQL_DATABASE": {
+     "defaultValue": "mautic",
+     "description": "Database created on the first start.",
+     "required": false
+    },
+    "MYSQL_USER": {
+     "defaultValue": "mautic",
+     "description": "User created on the first start with all rights on MYSQL_DATABASE.",
+     "required": false
+    },
+    "MYSQL_PASSWORD": {
+     "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+     "description": "Password of MYSQL_USER (generated).",
+     "required": false
+    },
+    "MYSQLHOST": {
+     "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+     "description": "Private hostname of this database.",
+     "required": false
+    },
+    "MYSQLPORT": {
+     "defaultValue": "3306",
+     "description": "MySQL port.",
+     "required": false
+    },
+    "MYSQLUSER": {
+     "defaultValue": "${{MYSQL_USER}}",
+     "description": "User for Mautic and Railway's Data tab.",
+     "required": false
+    },
+    "MYSQLPASSWORD": {
+     "defaultValue": "${{MYSQL_PASSWORD}}",
+     "description": "Password for Ghost and Railway's Data tab.",
+     "required": false
+    },
+    "MYSQLDATABASE": {
+     "defaultValue": "${{MYSQL_DATABASE}}",
+     "description": "Database for Ghost and Railway's Data tab.",
+     "required": false
+    },
+    "MYSQL_URL": {
+     "defaultValue": "mysql://${{MYSQL_USER}}:${{MYSQL_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:3306/${{MYSQL_DATABASE}}",
+     "description": "Private connection URL.",
+     "required": false
+    }
+   }
+  }
+ },
+ "buckets": []
+}
